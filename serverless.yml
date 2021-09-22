@@ -1,0 +1,32 @@
+service: ServerManagement
+frameworkVersion: "2.59.0"
+
+provider:
+  name: aws
+  versionFunctions: false
+  runtime: nodejs14.x
+  region: eu-west-1
+  stage: prod
+
+plugins:
+  - serverless-webpack
+  - serverless-offline
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+    packager: "yarn"
+
+  serverless-offline:
+    location: .webpack/service
+
+
+functions:
+  openServerManagementPageInChrome:
+    handler: handler.doprocess
+    events:
+      - http:
+          path: openServerManagementPageInChrome/process
+          method: get
+          cors: true
