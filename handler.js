@@ -12,6 +12,11 @@ import {
 
 const handler  = async (event) => {
     try {
+        function delay(time) {
+            return new Promise(function(resolve) { 
+                setTimeout(resolve, time)
+            });
+         }
         console.log('process.env.IS_OFFLINE', process.env.IS_OFFLINE);
         const executablePath = process.env.IS_OFFLINE
             ? "D:\\VisualCodeProjects\\openServerManagementPageInChrome\\node_modules\\puppeteer\\.local-chromium\\win64-901912\\chrome-win\\chrome.exe"//"C:\\Users\\Wissem\\test\\node_modules\\puppeteer\\.local-chromium\\win64-686378\\chrome-win\\chrome.exe"
@@ -36,10 +41,11 @@ const handler  = async (event) => {
         const {timeout} = event.queryStringParameters;
         console.log('url',url);
         console.log('timeout',timeout);
-
+        
         await page.goto(url, {
-            waitUntil: ["networkidle0", "load", "domcontentloaded"]
+            waitUntil: ["load","domcontentloaded"]
         });
+        await delay(7000);
         await page.evaluate(() => {
             document.domain = 'isograd.com';
             console.log('document.domain', document.domain)
@@ -56,7 +62,8 @@ const handler  = async (event) => {
         }).catch(e => {
             console.log('#deskdiv iframe[id*="iframe_"] doesnot exist', e.toString());
         });  //wait until thinfinity succeed to open rdp session and pass or timeout
-        await browser.close();
+
+        await page.close();
     }catch (e) {
         console.log('Exception',e.toString());
         return {
