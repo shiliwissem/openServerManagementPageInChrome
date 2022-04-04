@@ -12,6 +12,7 @@ import {
 
 const handler  = async (event) => {
     try {
+        process.setMaxListeners(Infinity);
         function delay(time) {
             return new Promise(function(resolve) { 
                 setTimeout(resolve, time)
@@ -22,7 +23,7 @@ const handler  = async (event) => {
             ? "D:\\VisualCodeProjects\\openServerManagementPageInChrome\\node_modules\\puppeteer\\.local-chromium\\win64-901912\\chrome-win\\chrome.exe"//"C:\\Users\\Wissem\\test\\node_modules\\puppeteer\\.local-chromium\\win64-686378\\chrome-win\\chrome.exe"
             : await chromium.executablePath;
         console.log('executablePath', executablePath);
-        const browser = await puppeteer.launch({
+        var browser = await puppeteer.launch({
             headless: true,
             args: [...new Set([...[
                 '--disable-features=site-per-process', //to look inside iframes
@@ -36,14 +37,14 @@ const handler  = async (event) => {
             executablePath
         });
 
-        const page = await browser.newPage();
+        var page = await browser.newPage();
         const {url} = event.queryStringParameters;
         const {timeout} = event.queryStringParameters;
         console.log('url',url);
         console.log('timeout',timeout);
         
         await page.goto(url, {
-            waitUntil: ["load","domcontentloaded"]
+            waitUntil: ["load","domcontentloaded"], timeout: 0
         });
         await delay(7000);
         await page.evaluate(() => {
@@ -64,8 +65,16 @@ const handler  = async (event) => {
         });  //wait until thinfinity succeed to open rdp session and pass or timeout
 
         await page.close();
+        await browser.close();
+
     }catch (e) {
         console.log('Exception',e.toString());
+        try{
+            await page.close();
+            await browser.close();
+        }catch(e){
+
+        }
         return {
             statusCode: 200,
             body: JSON.stringify(
