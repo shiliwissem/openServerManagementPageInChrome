@@ -6,7 +6,7 @@ provider:
   versionFunctions: false
   runtime: nodejs14.x
   region: eu-west-1
-  stage: dev
+  stage: prod
 
 plugins:
   - serverless-webpack

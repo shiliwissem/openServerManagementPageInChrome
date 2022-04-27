@@ -11,7 +11,7 @@
     "chrome-aws-lambda": "10.1.0",
     "middy": "*",
     "puppeteer-core": "5.4.0",
-    "serverless": "*",
+    "serverless": "2.59.0",
     "serverless-domain-manager": "*",
     "serverless-offline": "*",
     "serverless-webpack": "*",

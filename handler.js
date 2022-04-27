@@ -20,7 +20,7 @@ const handler  = async (event) => {
          }
         console.log('process.env.IS_OFFLINE', process.env.IS_OFFLINE);
         const executablePath = process.env.IS_OFFLINE
-            ? "D:\\VisualCodeProjects\\openServerManagementPageInChrome\\node_modules\\puppeteer\\.local-chromium\\win64-901912\\chrome-win\\chrome.exe"//"C:\\Users\\Wissem\\test\\node_modules\\puppeteer\\.local-chromium\\win64-686378\\chrome-win\\chrome.exe"
+            ? "D:\\TOSA\\openServerManagementPageInChrome\\node_modules\\puppeteer\\.local-chromium\\win64-901912\\chrome-win\\chrome.exe"//"C:\\Users\\Wissem\\test\\node_modules\\puppeteer\\.local-chromium\\win64-686378\\chrome-win\\chrome.exe"
             : await chromium.executablePath;
         console.log('executablePath', executablePath);
         var browser = await puppeteer.launch({
@@ -38,10 +38,13 @@ const handler  = async (event) => {
         });
 
         var page = await browser.newPage();
+        var success = false;
         const {url} = event.queryStringParameters;
         const {timeout} = event.queryStringParameters;
+        const {session_time} = event.queryStringParameters; //time to wait after session opened
         console.log('url',url);
         console.log('timeout',timeout);
+        console.log('session_time',session_time);
         
         await page.goto(url, {
             waitUntil: ["load","domcontentloaded"], timeout: 0
@@ -60,10 +63,16 @@ const handler  = async (event) => {
         const rdp_iframe = await elementHandle.contentFrame();
         await rdp_iframe.waitForSelector('#thinrdp_canvas_1 canvas', {timeout: timeout}).then(() => {
             console.log('#deskdiv iframe[id*="iframe_"] #thinrdp_canvas_1 canvas exist');
+            success = true;
         }).catch(e => {
             console.log('#deskdiv iframe[id*="iframe_"] doesnot exist', e.toString());
-        });  //wait until thinfinity succeed to open rdp session and pass or timeout
-
+        });
+        //wait until thinfinity succeed to open rdp session and pass or timeout
+        console.log('success',success);  
+        if(success=true && session_time>0){
+            console.log('awaiting '+session_time+'ms while rdp session is open');
+            await delay(parseInt(session_time));
+        }
         await page.close();
         await browser.close();
 
@@ -92,7 +101,7 @@ const handler  = async (event) => {
     body: JSON.stringify(
       {
         message: 'Alls done',
-        success:1
+        success:success
       },
       null,
       2
